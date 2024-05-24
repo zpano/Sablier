@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.19 <0.9.0;
+pragma solidity >=0.8.22 <0.9.0;
 
 import { Lockup } from "src/types/DataTypes.sol";
 
@@ -22,7 +22,7 @@ abstract contract Cancel_Integration_Fuzz_Test is Integration_Test, Cancel_Integ
         timeJump = _bound(timeJump, 1 seconds, 100 weeks);
 
         // Warp to the past.
-        vm.warp({ timestamp: getBlockTimestamp() - timeJump });
+        vm.warp({ newTimestamp: getBlockTimestamp() - timeJump });
 
         // Cancel the stream.
         lockup.cancel(defaultStreamId);
@@ -39,7 +39,7 @@ abstract contract Cancel_Integration_Fuzz_Test is Integration_Test, Cancel_Integ
 
     /// @dev Given enough fuzz runs, all of the following scenarios will be fuzzed:
     ///
-    /// - Multiple values for the current time
+    /// - Multiple values for the block timestamp
     /// - With and without withdrawals
     function testFuzz_Cancel(
         uint256 timeJump,
@@ -63,7 +63,7 @@ abstract contract Cancel_Integration_Fuzz_Test is Integration_Test, Cancel_Integ
         uint256 streamId = createDefaultStreamWithRecipient(address(goodRecipient));
 
         // Simulate the passage of time.
-        vm.warp({ timestamp: defaults.START_TIME() + timeJump });
+        vm.warp({ newTimestamp: defaults.START_TIME() + timeJump });
 
         // Bound the withdraw amount.
         uint128 streamedAmount = lockup.streamedAmountOf(streamId);
@@ -76,7 +76,7 @@ abstract contract Cancel_Integration_Fuzz_Test is Integration_Test, Cancel_Integ
 
         // Expect the assets to be refunded to the Sender.
         uint128 senderAmount = lockup.refundableAmountOf(streamId);
-        expectCallToTransfer({ to: users.sender, amount: senderAmount });
+        expectCallToTransfer({ to: users.sender, value: senderAmount });
 
         // Expect the relevant events to be emitted.
         uint128 recipientAmount = lockup.withdrawableAmountOf(streamId);

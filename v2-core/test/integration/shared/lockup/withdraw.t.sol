@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.19 <0.9.0;
+pragma solidity >=0.8.22 <0.9.0;
 
 import { Lockup_Integration_Shared_Test } from "./Lockup.t.sol";
 
@@ -8,39 +8,23 @@ abstract contract Withdraw_Integration_Shared_Test is Lockup_Integration_Shared_
 
     function setUp() public virtual override {
         defaultStreamId = createDefaultStream();
-        changePrank({ msgSender: users.recipient });
-    }
-
-    modifier whenNotDelegateCalled() {
-        _;
+        resetPrank({ msgSender: users.recipient });
     }
 
     modifier givenNotNull() {
         _;
     }
 
+    modifier givenRecipientContract() {
+        _;
+    }
+
+    modifier givenSenderContract() {
+        _;
+    }
+
     modifier givenStreamNotDepleted() {
-        vm.warp({ timestamp: defaults.START_TIME() });
-        _;
-    }
-
-    modifier whenCallerUnauthorized() {
-        _;
-    }
-
-    modifier whenCallerAuthorized() {
-        _;
-    }
-
-    modifier whenToNonZeroAddress() {
-        _;
-    }
-
-    modifier whenWithdrawAmountNotZero() {
-        _;
-    }
-
-    modifier whenWithdrawAmountNotGreaterThanWithdrawableAmount() {
+        vm.warp({ newTimestamp: defaults.START_TIME() });
         _;
     }
 
@@ -48,7 +32,31 @@ abstract contract Withdraw_Integration_Shared_Test is Lockup_Integration_Shared_
         _;
     }
 
+    modifier whenNoOverdraw() {
+        _;
+    }
+
+    modifier whenNotDelegateCalled() {
+        _;
+    }
+
     modifier whenStreamHasNotBeenCanceled() {
+        _;
+    }
+
+    modifier whenToNonZeroAddress() {
+        _;
+    }
+
+    modifier whenWithdrawalAddressIsRecipient() {
+        _;
+    }
+
+    modifier whenWithdrawalAddressNotRecipient() {
+        _;
+    }
+
+    modifier whenWithdrawAmountNotZero() {
         _;
     }
 }

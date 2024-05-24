@@ -12,8 +12,8 @@ report it to us.
 Starting on July 1, 2023, the [sablier-labs/v2-periphery](https://github.com/sablier-labs/v2-periphery) repository is
 subject to the Sablier V2 Bug Bounty (the "Program") to incentivize responsible bug disclosure.
 
-We are limiting the scope of the Program to critical and high severity bugs, and are offering a reward of up to $50,000.
-Happy hunting!
+We are limiting the scope of the Program to critical and high severity bugs, and are offering a reward of up to
+$100,000. Happy hunting!
 
 ### Scope
 
@@ -22,8 +22,8 @@ The scope of the Program is limited to bugs that result in the draining of funds
 The Program does NOT cover the following:
 
 - Code located in the [test](./test) or [script](./script) directories.
-- External code in the [lib](./lib) directory, except for code that is explicitly used by a deployed contract located in
-  the [src](./src) directory.
+- External code in `node_modules`, except for code that is explicitly used by a deployed contract located in the
+  [src](./src) directory.
 - Contract deployments on test networks, such as Sepolia.
 - Bugs in third-party contracts or platforms interacting with Sablier V2 Periphery.
 - Previously reported or discovered vulnerabilities in contracts built by third parties on Sablier V2 Periphery.
@@ -47,11 +47,13 @@ vulnerability, it must adhere to these assumptions as well:
 
 - [All assumptions](https://github.com/sablier-labs/v2-core/blob/main/SECURITY.md) in Sablier V2 Core apply to Sablier
   V2 Periphery as well.
+- In `SablierV2MerkleLT`, the tranche unlock percentages and the durations will be same for all airdrop claimers.
+- In `SablierV2MerkleLockupFactory`, there should be no need to create two Merkle campaigns with identical parameters.
 
 ### Rewards
 
 Rewards will be allocated based on the severity of the bug disclosed and will be evaluated and rewarded at the
-discretion of the Sablier Labs team. For critical bugs that lead to any loss of user funds, rewards of up to $50,000
+discretion of the Sablier Labs team. For critical bugs that lead to any loss of user funds, rewards of up to $100,000
 will be granted. Lower severity bugs will be rewarded at the discretion of the team.
 
 ### Disclosure

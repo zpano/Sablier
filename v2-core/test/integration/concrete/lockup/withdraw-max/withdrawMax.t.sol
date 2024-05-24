@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.19 <0.9.0;
+pragma solidity >=0.8.22 <0.9.0;
 
 import { Lockup } from "src/types/DataTypes.sol";
 
@@ -13,10 +13,10 @@ abstract contract WithdrawMax_Integration_Concrete_Test is Integration_Test, Wit
 
     function test_WithdrawMax_EndTimeNotInTheFuture() external {
         // Warp to the stream's end.
-        vm.warp({ timestamp: defaults.END_TIME() + 1 seconds });
+        vm.warp({ newTimestamp: defaults.END_TIME() + 1 seconds });
 
         // Expect the ERC-20 assets to be transferred to the Recipient.
-        expectCallToTransfer({ to: users.recipient, amount: defaults.DEPOSIT_AMOUNT() });
+        expectCallToTransfer({ to: users.recipient, value: defaults.DEPOSIT_AMOUNT() });
 
         // Expect the relevant event to be emitted.
         vm.expectEmit({ emitter: address(lockup) });
@@ -52,13 +52,13 @@ abstract contract WithdrawMax_Integration_Concrete_Test is Integration_Test, Wit
 
     function test_WithdrawMax() external givenEndTimeInTheFuture {
         // Simulate the passage of time.
-        vm.warp({ timestamp: defaults.WARP_26_PERCENT() });
+        vm.warp({ newTimestamp: defaults.WARP_26_PERCENT() });
 
         // Get the withdraw amount.
         uint128 withdrawAmount = lockup.withdrawableAmountOf(defaultStreamId);
 
         // Expect the assets to be transferred to the Recipient.
-        expectCallToTransfer({ to: users.recipient, amount: withdrawAmount });
+        expectCallToTransfer({ to: users.recipient, value: withdrawAmount });
 
         // Expect the relevant event to be emitted.
         vm.expectEmit({ emitter: address(lockup) });

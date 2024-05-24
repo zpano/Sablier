@@ -12,8 +12,8 @@ report it to us.
 Starting on July 1, 2023, the [sablier-labs/v2-core](https://github.com/sablier-labs/v2-core) repository is subject to
 the Sablier V2 Bug Bounty (the "Program") to incentivize responsible bug disclosure.
 
-We are limiting the scope of the Program to critical and high severity bugs, and are offering a reward of up to $50,000.
-Happy hunting!
+We are limiting the scope of the Program to critical and high severity bugs, and are offering a reward of up to
+$100,000. Happy hunting!
 
 ### Scope
 
@@ -22,8 +22,8 @@ The scope of the Program is limited to bugs that result in the draining of funds
 The Program does NOT cover the following:
 
 - Code located in the [test](./test) or [script](./script) directories.
-- External code in the [lib](./lib) directory, except for code that is explicitly used by a deployed contract located in
-  the [src](./src) directory.
+- External code in `node_modules`, except for code that is explicitly used by a deployed contract located in the
+  [src](./src) directory.
 - Contract deployments on test networks, such as Sepolia.
 - Bugs in third-party contracts or platforms interacting with Sablier V2 Core.
 - Previously reported or discovered vulnerabilities in contracts built by third parties on Sablier V2 Core.
@@ -45,7 +45,8 @@ Vulnerabilities contingent upon the occurrence of any of the following also are 
 Sablier V2 Core has been developed with a number of technical assumptions in mind. For a disclosure to qualify as a
 vulnerability, it must adhere to these assumptions as well:
 
-- The immutable variable `MAX_SEGMENT_COUNT` has a low value that cannot lead to an overflow of the block gas limit.
+- The immutable variables `MAX_SEGMENT_COUNT` and `MAX_TRANCHE_COUNT` have values that cannot lead to an overflow of the
+  block gas limit.
 - The total supply of any ERC-20 token remains below 2<sup>128</sup> - 1, i.e. `type(uint128).max`.
 - The `transfer` and `transferFrom` methods of any ERC-20 token strictly reduce the sender's balance by the transfer
   amount and increase the recipient's balance by the same amount. In other words, tokens that charge fees on transfers
@@ -57,7 +58,7 @@ vulnerability, it must adhere to these assumptions as well:
 ### Rewards
 
 Rewards will be allocated based on the severity of the bug disclosed and will be evaluated and rewarded at the
-discretion of the Sablier Labs team. For critical bugs that lead to any loss of user funds, rewards of up to $50,000
+discretion of the Sablier Labs team. For critical bugs that lead to any loss of user funds, rewards of up to $100,000
 will be granted. Lower severity bugs will be rewarded at the discretion of the team.
 
 ### Disclosure

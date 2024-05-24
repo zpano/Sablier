@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.19 <0.9.0;
+pragma solidity >=0.8.22 <0.9.0;
 
 import { ISablierV2Lockup } from "src/interfaces/ISablierV2Lockup.sol";
-import { ISablierV2LockupRecipient } from "src/interfaces/hooks/ISablierV2LockupRecipient.sol";
+import { ISablierV2Recipient } from "src/interfaces/hooks/ISablierV2Recipient.sol";
 import { Errors } from "src/libraries/Errors.sol";
 
 import { Lockup } from "src/types/DataTypes.sol";
@@ -28,21 +28,21 @@ abstract contract Cancel_Integration_Concrete_Test is Integration_Test, Cancel_I
     }
 
     function test_RevertGiven_StatusDepleted() external whenNotDelegateCalled givenNotNull givenStreamCold {
-        vm.warp({ timestamp: defaults.END_TIME() });
+        vm.warp({ newTimestamp: defaults.END_TIME() });
         lockup.withdrawMax({ streamId: defaultStreamId, to: users.recipient });
         vm.expectRevert(abi.encodeWithSelector(Errors.SablierV2Lockup_StreamDepleted.selector, defaultStreamId));
         lockup.cancel(defaultStreamId);
     }
 
     function test_RevertGiven_StatusCanceled() external whenNotDelegateCalled givenNotNull givenStreamCold {
-        vm.warp({ timestamp: defaults.CLIFF_TIME() });
+        vm.warp({ newTimestamp: defaults.CLIFF_TIME() });
         lockup.cancel(defaultStreamId);
         vm.expectRevert(abi.encodeWithSelector(Errors.SablierV2Lockup_StreamCanceled.selector, defaultStreamId));
         lockup.cancel(defaultStreamId);
     }
 
     function test_RevertGiven_StatusSettled() external whenNotDelegateCalled givenNotNull givenStreamCold {
-        vm.warp({ timestamp: defaults.END_TIME() });
+        vm.warp({ newTimestamp: defaults.END_TIME() });
         vm.expectRevert(abi.encodeWithSelector(Errors.SablierV2Lockup_StreamSettled.selector, defaultStreamId));
         lockup.cancel(defaultStreamId);
     }
@@ -55,7 +55,7 @@ abstract contract Cancel_Integration_Concrete_Test is Integration_Test, Cancel_I
         whenCallerUnauthorized
     {
         // Make Eve the caller in this test.
-        changePrank({ msgSender: users.eve });
+        resetPrank({ msgSender: users.eve });
 
         // Run the test.
         vm.expectRevert(
@@ -72,7 +72,7 @@ abstract contract Cancel_Integration_Concrete_Test is Integration_Test, Cancel_I
         whenCallerUnauthorized
     {
         // Make the Recipient the caller in this test.
-        changePrank({ msgSender: users.recipient });
+        resetPrank({ msgSender: users.recipient });
 
         // Run the test.
         vm.expectRevert(
@@ -95,7 +95,7 @@ abstract contract Cancel_Integration_Concrete_Test is Integration_Test, Cancel_I
 
     function test_Cancel_StatusPending() external {
         // Warp to the past.
-        vm.warp({ timestamp: getBlockTimestamp() - 1 seconds });
+        vm.warp({ newTimestamp: getBlockTimestamp() - 1 seconds });
 
         // Cancel the stream.
         lockup.cancel(defaultStreamId);
@@ -144,7 +144,7 @@ abstract contract Cancel_Integration_Concrete_Test is Integration_Test, Cancel_I
         vm.expectCall(
             address(noop),
             abi.encodeCall(
-                ISablierV2LockupRecipient.onStreamCanceled, (streamId, users.sender, senderAmount, recipientAmount)
+                ISablierV2Recipient.onLockupStreamCanceled, (streamId, users.sender, senderAmount, recipientAmount)
             )
         );
 
@@ -177,7 +177,7 @@ abstract contract Cancel_Integration_Concrete_Test is Integration_Test, Cancel_I
         vm.expectCall(
             address(revertingRecipient),
             abi.encodeCall(
-                ISablierV2LockupRecipient.onStreamCanceled, (streamId, users.sender, senderAmount, recipientAmount)
+                ISablierV2Recipient.onLockupStreamCanceled, (streamId, users.sender, senderAmount, recipientAmount)
             )
         );
 
@@ -211,7 +211,7 @@ abstract contract Cancel_Integration_Concrete_Test is Integration_Test, Cancel_I
         vm.expectCall(
             address(reentrantRecipient),
             abi.encodeCall(
-                ISablierV2LockupRecipient.onStreamCanceled, (streamId, users.sender, senderAmount, recipientAmount)
+                ISablierV2Recipient.onLockupStreamCanceled, (streamId, users.sender, senderAmount, recipientAmount)
             )
         );
 
@@ -242,14 +242,14 @@ abstract contract Cancel_Integration_Concrete_Test is Integration_Test, Cancel_I
 
         // Expect the assets to be refunded to the Sender.
         uint128 senderAmount = lockup.refundableAmountOf(streamId);
-        expectCallToTransfer({ to: users.sender, amount: senderAmount });
+        expectCallToTransfer({ to: users.sender, value: senderAmount });
 
         // Expect a call to the hook.
         uint128 recipientAmount = lockup.withdrawableAmountOf(streamId);
         vm.expectCall(
             address(goodRecipient),
             abi.encodeCall(
-                ISablierV2LockupRecipient.onStreamCanceled, (streamId, users.sender, senderAmount, recipientAmount)
+                ISablierV2Recipient.onLockupStreamCanceled, (streamId, users.sender, senderAmount, recipientAmount)
             )
         );
 
